@@ -7,7 +7,7 @@
 typedef struct circuit_variable{
   char name[21];
   unsigned int value;
-  struct circuit_variable* next;
+  struct circuit_variable *next;
 }circuit_variable;
 
 /* Grey Code Variable that stores the grey code sequence and # of bits */
@@ -55,7 +55,10 @@ int main(int argc, char **argv){
     char input1[21];
     char input2[21];
     char output[21];
-    unsigned int temp, temp1, temp2, result;
+    unsigned int temp;
+    unsigned int temp1; 
+    unsigned int temp2;
+    unsigned int result;
     //Read in The File
     FILE *fp = fopen(argv[1], "r");
     /* Find Inputvar and Outputvar first */
@@ -97,6 +100,15 @@ int main(int argc, char **argv){
                 input_variable[i].value = 0;
             }
         }
+        for(unsigned int i = 0; i < output_size; i++){
+            output_variable[i].value = 2;
+        }
+        circuit_variable* ptr = temp_variable;
+        while(ptr != NULL){
+            ptr->value = 2;
+            ptr = ptr->next;
+        }
+        /* Loop until output variables are  all filled */
         while(1){
             /* Building the circuit */
             while(fscanf(fp, "%s", gate) != EOF){
@@ -227,9 +239,11 @@ int main(int argc, char **argv){
                     for(unsigned int i = 0; i < multiplexer_input_size; i++){
                         if(grey_code->grey_code_sequence[i] == temp){
                             setValue(input_arr[i], output);
+                            break;
                         }
                     }
                     fscanf(fp, "%*[^\n]\n");
+                    free(grey_code);
                 }else{
                     fscanf(fp, "%*[^\n]\n");
                 }
@@ -257,24 +271,41 @@ int main(int argc, char **argv){
         printf("\n");
 
         /* Reset the Storages*/
-        for(unsigned int i = 0; i < input_size; i++){
-            input_variable[0].value = 2;
-        }
-        for(unsigned int i = 0; i < output_size; i++){
-            output_variable[0].value = 2;
-        }
-        circuit_variable* ptr = temp_variable;
-        while(ptr != NULL){
-            ptr->value = 2;
-            ptr = ptr->next;
-        }
+        // for(unsigned int i = 0; i < input_size; i++){
+        //     input_variable[0].value = 2;
+        // }
+
+        // for(unsigned int i = 0; i < output_size; i++){
+        //     output_variable[0].value = 2;
+        // }
+        // circuit_variable* ptr = temp_variable;
+        // while(ptr != NULL){
+        //     ptr->value = 2;
+        //     ptr = ptr->next;
+        // }
+
+        // circuit_variable* ptr = temp_variable;
+        // circuit_variable* temp = NULL;
+        // while(ptr != NULL){
+        //     temp = ptr->next;
+        //     free(ptr);
+        //     ptr = temp;
+        // }
+        // temp_variable = NULL;
         rewind(fp);//Point fp to the beginning of circuit file
     }
     /*Free Input, Output, Temp, and Grey Code Object */
-
+    free(input_variable);
+    free(output_variable);
+    free(input_grey_code);
+    circuit_variable* ptr = temp_variable;
+    while(ptr != NULL){
+      temp_variable = ptr->next;
+      free(ptr);
+      ptr = temp_variable;
+    }
     fclose(fp);
     return 0;
-    
   }
   unsigned int not(unsigned int input){
     return input ^ 1;
@@ -326,10 +357,10 @@ int main(int argc, char **argv){
     }else{
       /* Searching within the Inputs */
       for(unsigned int i = 0; i < input_size; i++){
-      if(strcmp(input_variable[i].name, name) == 0){
-        return input_variable[i].value;
+        if(strcmp(input_variable[i].name, name) == 0){
+          return input_variable[i].value;
+        }
       }
-    }
     /* Searching within the Outputs */
     for(unsigned int i = 0; i < output_size; i++){
       if(strcmp(output_variable[i].name, name) == 0){
@@ -342,9 +373,9 @@ int main(int argc, char **argv){
         return ptr->value;
       }
       ptr = ptr->next;
+      }
     }
     return 2;
-    }
   }
   void setValue(unsigned int value, char* name){
     /* Searching within the Inputs */

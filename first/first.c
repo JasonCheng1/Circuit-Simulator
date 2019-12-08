@@ -217,8 +217,6 @@ int main(int argc, char **argv){
               }
             }
             fscanf(fp, "%*[^\n]\n");
-        }else{
-          printf("Something went wrong");
         }
       }
         /* Print Result for this particular Grey Code Sequence */
@@ -237,9 +235,19 @@ int main(int argc, char **argv){
         fscanf(fp, "%*[^\n]\n");//skip inputvar
         fscanf(fp, "%*[^\n]\n");//skip outputvar
       }
+          
+    /*Free Input, Output, Temp, and Grey Code Object */
+    free(input_variable);
+    free(output_variable);
+    free(input_grey_code);
+    circuit_variable* ptr = temp_variable;
+    while(ptr != NULL){
+      temp_variable = ptr->next;
+      free(ptr);
+      ptr = temp_variable;
+    }
     fclose(fp);
     return 0;
-    /*Free Input, Output, Temp, and Grey Code Object */
   }
   unsigned int not(unsigned int input){
     return input ^ 1;
@@ -330,6 +338,4 @@ int main(int argc, char **argv){
     /* Searching within the Temporary */
     insert(name, value);
   }
-
-
 
